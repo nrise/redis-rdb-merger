@@ -14,11 +14,16 @@ def merge(rdbs, out_file):
     for rdb in rdbs:
         with open(rdb, 'rb') as f:
             s = f.read()
-            if not prefix:
-                prefix = s[:11]
+            redis_code = int(s[5:9])
+            prefix_length = 11
+            if redis_code > 6:
+                prefix_length = 80
+            if not prefix or redis_code > 6:
+                prefix = s[:prefix_length]
+
             if not suffix:
                 suffix = s[-9:]
-            data.append(s[11:-9])
+            data.append(s[prefix_length:-9])
 
     with open(out_file, 'wb') as f:
         f.write(b'{}{}{}'.format(prefix, b''.join(data), suffix))
